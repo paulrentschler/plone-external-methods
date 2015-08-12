@@ -1,3 +1,8 @@
+# Custom ignores
+setup_data_locker_settings.py
+
+
+# Standard Plone ignores
 *.pyc
 *.pyo
 *.tmp*
