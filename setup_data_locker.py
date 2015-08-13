@@ -17,6 +17,9 @@ from Products.PloneFormGen.interfaces import \
 
 from collective.webservicespfgadapter.config import extra_data
 
+import os
+
+
 
 def setup_data_locker(self):
     """
@@ -26,17 +29,23 @@ def setup_data_locker(self):
     #
     # SETTINGS
     #
-    try:
-        from setup_data_locker_settings import *
-    except:
-        DATA_LOCKER_URL = ""
-        DELETE_EXISTING_ACTION_ADAPTERS = False 
-        FALLBACK_RECIPIENT_EMAIL = ""
-        FALLBACK_RECIPIENT_NAME = ""
-        FORM_CREATOR = ""
-        NOTIFY_ON_FAILURE_EMAILS = ""
-        OVERRIDE_EXISTING_SETUP_CHECK = False
-
+    # Copy the `setup_data_locker.settings.dist` file and rename 
+    # it `setup_data_locker.settings`. Then define your settings there.
+    #
+    settings = {
+        'data_locker_url': '',
+        'delete_existing_action_adapters': False,
+        'fallback_recipient_email': '',
+        'fallback_recipient_name': '',
+        'form_creator': '',
+        'notify_on_failure_emails': '',
+        'override_existing_setup_check': False,
+        }
+    #try:
+    settings = load_settings(settings)
+    #except:
+    #    pass
+    import pdb; pdb.set_trace()    
 
 
     #
@@ -46,25 +55,25 @@ def setup_data_locker(self):
     if not IPloneFormGenForm.providedBy(self):
         raise Exception("Must be executed on a PloneFormGen Form object")
     object_ids = [obj.id for obj in self.objectValues()]
-    if 'data-locker' in object_ids and not OVERRIDE_EXISTING_SETUP_CHECK:
+    if 'data-locker' in object_ids and not settings['override_existing_setup_check']:
         print "Already setup for the Data Locker: %s" % self.absolute_url()
     else:
-        if DELETE_EXISTING_ACTION_ADAPTERS:
+        if settings['delete_existing_action_adapters']:
             delete_action_adapters(self)
-        elif OVERRIDE_EXISTING_SETUP_CHECK:
+        elif settings['override_existing_setup_check']:
             delete_action_adapters(self, 'data-locker')
         create_data_locker_adapter(
             self, 
-            DATA_LOCKER_URL, 
-            NOTIFY_ON_FAILURE_EMAILS
+            settings['data_locker_url'], 
+            settings['notify_on_failure_emails']
             )
         create_fallback_adapter(
             self, 
-            FALLBACK_RECIPIENT_EMAIL, 
-            FALLBACK_RECIPIENT_NAME
+            settings['fallback_recipient_email'], 
+            settings['fallback_recipient_name']
             )
-        if FORM_CREATOR:
-            change_form_creator(self, FORM_CREATOR)
+        if settings['form_creator']:
+            change_form_creator(self, settings['form_creator'])
 
 
 def change_form_creator(form, creator):
@@ -144,4 +153,33 @@ def delete_action_adapters(form, id=None):
             if id == None or id == obj.id:
                 api.content.delete(obj=obj)
                 print "Deleting existing adapter at: %s" % obj.absolute_url()
+
+
+def load_settings(settings):
+    """
+    Loads settings from a file called `setup_data_locker.settings` located in
+    the same directory as the external method
+    """
+    # find the directory where the external method lives
+    for root, dirs, files in os.walk('/'):
+        if 'setup_data_locker.py' in files:
+            path = root
+            break
+    # read the settings
+    try:
+        with open(os.path.join(path, 'setup_data_locker.settings')) as settings_file:
+            for line in settings_file:
+                if '=' in line:
+                    (setting, value) = line.split('=')
+                    if setting.strip().lower() in settings.keys():
+                        value = value.strip()
+                        if value[0] in ('"', "'"):
+                            value = value[1:]
+                        if value[-1] in ('"', "'"):
+                            value = value[:-1]
+                        settings[setting.strip().lower()] = value
+        settings_file.close()
+    except:
+        raise
+    return settings
 

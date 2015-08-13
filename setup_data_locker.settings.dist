@@ -1,0 +1,31 @@
+# Settings file for the setup_data_locker.py External Method
+#
+# Copy this file and rename it to `setup_data_locker.settings` and customize
+# the settings to for your needs
+#
+
+# Specify the directory of the Data Locker
+#   This is the URL specified in the Web Services Adapter
+DATA_LOCKER_URL = ""
+
+# Should all existing action adapters in the Form Folder be deleted?
+DELETE_EXISTING_ACTION_ADAPTERS = False
+
+# The name and email of the person to receive the encrypted emails if the
+# submission to the Data Locker fails
+FALLBACK_RECIPIENT_EMAIL = ""
+FALLBACK_RECIPIENT_NAME = ""
+
+# Who should be the first creator on the Form Folder
+#   Leave this blank to leave the creator information unchanged
+FORM_CREATOR = ""
+
+# Who should be notified by the Web Services Adapter when failures occur?
+#   This can be a list of email addresses separated by commas
+NOTIFY_ON_FAILURE_EMAILS = ""
+
+# The External Method will not do anything if an action adapter with the
+# id 'data-locker' already exists in the Form Folder. By setting this value
+# to True, that check is ignored and the Form Folder is processed anyway.
+OVERRIDE_EXISTING_SETUP_CHECK = False
+

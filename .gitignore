@@ -1,5 +1,5 @@
 # Custom ignores
-setup_data_locker_settings.py
+setup_data_locker.settings
 
 
 # Standard Plone ignores
