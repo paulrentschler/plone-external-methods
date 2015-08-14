@@ -44,6 +44,11 @@ To use an External Method in Zope/Plone you need to first tell Zope that it exis
 
 ### setup_data_locker.py
 
+Used to reconfigure a PloneFormGen FormFolder to use the Data Locker product. It creates a [Web Services Adapter](https://github.com/PSUEducationalEquity/collective.webservicespfgadapter) configured to send data to the Data Locker application and also creates a Mailer Adapter configured to send an encrypted email of the form's data if the Web Services Adapter fails.
+
+Uses a `setup_data_locker.settings` file that is excluded from the repository to specify the settings that go into the adapters. `setup_data_locker.settings.dist` provides an example file with blank values.
+
+This script can also be added to a "Python (Script)" to loop over all FormFolders in the site and convert them all.
 
 
 ## Resources
